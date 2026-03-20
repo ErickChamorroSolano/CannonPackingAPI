@@ -14,27 +14,18 @@ namespace CannonPackingAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Towel>()
-                .HasIndex(u => u.ItemCode)
+                .HasIndex(t => t.ItemCode)
                 .IsUnique();
 
             modelBuilder.Entity<Box>()
                 .HasIndex(b => b.BoxCode)
                 .IsUnique();
 
-            modelBuilder.Entity<BoxTowel>()
-                .HasOne(bi => bi.Box)
-                .WithMany(b => b.BoxTowels)
-                .HasForeignKey(bi => bi.BoxId);
-
-            modelBuilder.Entity<BoxTowel>()
-                .HasOne(bi => bi.towel)
-                .WithMany(u => u.BoxTowels)
-                .HasForeignKey(bi => bi.TowelId);
-
-            modelBuilder.Entity<BoxTowel>()
-                .HasIndex(bi => bi.TowelId)
-                .HasFilter("IsActive = 1")
-                .IsUnique();
+            modelBuilder.Entity<Towel>()
+                .HasOne(t => t.Box)
+                .WithMany(b => b.Towels)
+                .HasForeignKey(t => t.BoxId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

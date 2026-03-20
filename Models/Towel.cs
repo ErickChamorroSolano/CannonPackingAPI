@@ -4,8 +4,13 @@
     {
         public int Id { get; set; }
         public string ItemCode { get; set; } = string.Empty;
-        public bool IsActive { get; set; } = true;
+        public string ProductCode { get; set; } = string.Empty;
 
-        public ICollection<BoxTowel> BoxTowels { get; set; } = new List<BoxTowel>();
+        public string Status { get; set; } = "LOOSE";
+
+        public int? BoxId { get; set; }
+        public Box? Box { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

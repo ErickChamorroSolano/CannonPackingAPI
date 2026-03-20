@@ -19,7 +19,7 @@ namespace CannonPackingAPI.Services
             if (box == null || !box.IsActive)
                 throw new Exception("La caja no existe.");
 
-            if (box.BoxStatus != "OPEN")
+            if (box.Status != "OPEN")
                 throw new Exception("La caja está cerrada.");
 
             var currentCount = await _context.BoxTowels
