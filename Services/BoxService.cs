@@ -15,20 +15,20 @@ namespace CannonPackingAPI.Services
 
         public async Task AddTowelToBox(int boxId, int towelId)
         {
-            var box = await _context.Boxes.FindAsync(boxId);
+            var box = await _context.Box.FindAsync(boxId);
             if (box == null || !box.IsActive)
                 throw new Exception("La caja no existe.");
 
-            if (box.Status != "OPEN")
+            if (box.BoxStatus != "OPEN")
                 throw new Exception("La caja está cerrada.");
 
-            var currentCount = await _context.BoxTowels
+            var currentCount = await _context.BoxTowel
                 .CountAsync(x => x.BoxId == boxId && x.IsActive);
 
             if (currentCount >= box.Capacity)
                 throw new Exception("La caja está al limite de capacidad.");
 
-            var unitInAnotherBox = await _context.BoxTowels
+            var unitInAnotherBox = await _context.BoxTowel
                 .AnyAsync(x => x.TowelId == towelId && x.IsActive);
 
             if (unitInAnotherBox)
@@ -40,7 +40,7 @@ namespace CannonPackingAPI.Services
                 TowelId = towelId
             };
 
-            _context.BoxTowels.Add(boxItem);
+            _context.BoxTowel.Add(boxItem);
             await _context.SaveChangesAsync();
         }
     }

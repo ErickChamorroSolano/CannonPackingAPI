@@ -14,35 +14,32 @@ namespace CannonPackingAPI.Services
 
         public async Task Pack(int boxId, int towelId)
         {
-            var box = await _context.Boxes
-                .Include(b => b.Towels)
-                .FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
+            var box = await _context.Box.Include(b => b.Towels).FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
 
             if (box == null)
                 throw new Exception("la caja no existe.");
 
-            if (box.Status != "OPEN")
+            if (box.BoxStatus != "OPEN")
                 throw new Exception("La caja está cerrada.");
 
-            var towel = await _context.Towels
-                .FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
+            var towel = await _context.Towel.FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
 
             if (towel == null)
                 throw new Exception("El item no existe.");
 
-            if (towel.Status != "LOOSE")
+            if (towel.TowelStatus != "LOOSE")
                 throw new Exception("El item ya está empacado.");
 
             if (towel.ProductCode != box.ProductCode)
                 throw new Exception("El producto no coincide con la caja.");
 
-            var currentCount = box.Towels.Count(t => t.IsActive && t.Status == "PACKED");
+            var currentCount = box.Towels.Count(t => t.IsActive && t.TowelStatus == "PACKED");
 
             if (currentCount >= box.Capacity)
                 throw new Exception("La caja está llena.");
 
             // APPLY
-            towel.Status = "PACKED";
+            towel.TowelStatus = "PACKED";
             towel.BoxId = boxId;
 
             await _context.SaveChangesAsync();
@@ -51,25 +48,24 @@ namespace CannonPackingAPI.Services
         // UNPACK
         public async Task Unpack(int boxId, int towelId)
         {
-            var box = await _context.Boxes
-                .FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
+            var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
 
             if (box == null)
                 throw new Exception("La caja no existe.");
 
-            if (box.Status != "OPEN")
+            if (box.BoxStatus != "OPEN")
                 throw new Exception("La caja está cerrada.");
 
-            var towel = await _context.Towels
+            var towel = await _context.Towel
                 .FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
 
             if (towel == null)
                 throw new Exception("El item no existe.");
 
-            if (towel.Status != "PACKED" || towel.BoxId != boxId)
+            if (towel.TowelStatus != "PACKED" || towel.BoxId != boxId)
                 throw new Exception("El item no pertenece a ésta caja.");
 
-            towel.Status = "LOOSE";
+            towel.TowelStatus = "LOOSE";
             towel.BoxId = null;
 
             await _context.SaveChangesAsync();
@@ -78,17 +74,15 @@ namespace CannonPackingAPI.Services
         // Cerrar caja
         public async Task CloseBox(int boxId)
         {
-            var box = await _context.Boxes
-                .FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
+            var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
 
             if (box == null)
                 throw new Exception("La caja no existe.");
 
-            if (box.Status != "OPEN")
+            if (box.BoxStatus != "OPEN")
                 throw new Exception("La caja ya está cerrada.");
 
-            box.Status = "CLOSED";
-
+            box.BoxStatus = "CLOSED";
             await _context.SaveChangesAsync();
         }
     }

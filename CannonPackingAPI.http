@@ -1,4 +1,4 @@
-@CannonPackingAPI_HostAddress = http://localhost:5177
+@CannonPackingAPI_HostAddress = http://localhost:5177/swagger
 
 GET {{CannonPackingAPI_HostAddress}}/weatherforecast/
 Accept: application/json
