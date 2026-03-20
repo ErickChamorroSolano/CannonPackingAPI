@@ -1,4 +1,5 @@
 ﻿using CannonPackingAPI.Data;
+using CannonPackingAPI.DTOs;
 using CannonPackingAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,17 +18,44 @@ namespace CannonPackingAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Towel towel)
+        public async Task<IActionResult> Create(TowelDto dto)
         {
-            _context.Towels.Add(towel);
+            if (string.IsNullOrWhiteSpace(dto.ItemCode))
+                return BadRequest("El código del item es requerido.");
+
+            if (string.IsNullOrWhiteSpace(dto.ProductCode))
+                return BadRequest("El código del producto es requerido.");
+
+            var exists = await _context.Towel
+                .AnyAsync(t => t.ItemCode == dto.ItemCode);
+
+            if (exists)
+                return BadRequest("El código del item ya existe.");
+
+            var towel = new Towel
+            {
+                ItemCode = dto.ItemCode,
+                ProductCode = dto.ProductCode,
+                TowelStatus = "LOOSE",
+                IsActive = true
+            };
+
+            _context.Towel.Add(towel);
             await _context.SaveChangesAsync();
-            return Ok(towel);
+
+            return Ok(new
+            {
+                towel.Id,
+                towel.ItemCode,
+                towel.ProductCode,
+                towel.TowelStatus
+            });
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var units = await _context.Towels
+            var units = await _context.Towel
                 .Where(x => x.IsActive)
                 .ToListAsync();
 

@@ -5,12 +5,8 @@
         public int Id { get; set; }
         public string ItemCode { get; set; } = string.Empty;
         public string ProductCode { get; set; } = string.Empty;
-
-        public string Status { get; set; } = "LOOSE";
-
-        public int? BoxId { get; set; }
-        public Box? Box { get; set; }
-
+        public string TowelStatus { get; set; } = "LOOSE";
         public bool IsActive { get; set; } = true;
+        public ICollection<BoxTowel> BoxTowels { get; set; } = new List<BoxTowel>();
     }
 }
