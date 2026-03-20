@@ -55,15 +55,19 @@ namespace CannonPackingAPI.Controllers
                 box.BoxCode,
                 box.ProductCode,
                 box.Capacity,
-                box.BoxStatus
+                box.BoxStatus,
+                box.IsActive
             });
         }
 
-        [HttpPost("{boxId}/add-unit/{unitId}")]
-        public async Task<IActionResult> AddUnit(int boxId, int unitId)
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
-            await _service.AddTowelToBox(boxId, unitId);
-            return Ok();
+            var boxes = await _context.Box
+                .Where(x => x.IsActive)
+                .ToListAsync();
+
+            return Ok(boxes);
         }
     }
 }

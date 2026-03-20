@@ -48,7 +48,8 @@ namespace CannonPackingAPI.Controllers
                 towel.Id,
                 towel.ItemCode,
                 towel.ProductCode,
-                towel.TowelStatus
+                towel.TowelStatus,
+                towel.IsActive
             });
         }
 
