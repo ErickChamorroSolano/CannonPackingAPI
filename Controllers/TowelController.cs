@@ -62,5 +62,22 @@ namespace CannonPackingAPI.Controllers
 
             return Ok(units);
         }
+
+        // Eliminar (inhabilitar)
+        [HttpPut("{id}/disable")]
+        public async Task<IActionResult> Disable(int id)
+        {
+            var towel = await _context.Towel.FindAsync(id);
+
+            if (towel == null)
+                return NotFound();
+
+            if (towel.TowelStatus == "PACKED")
+                return BadRequest("No se puede deshabilitar un item empacado.");
+
+            towel.IsActive = false;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

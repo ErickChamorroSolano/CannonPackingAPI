@@ -69,5 +69,26 @@ namespace CannonPackingAPI.Controllers
 
             return Ok(boxes);
         }
+
+        // Eliminar (inhabilitar)
+        [HttpPut("{id}/disable")]
+        public async Task<IActionResult> Disable(int id)
+        {
+            var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == id);
+
+            if (box == null)
+                return NotFound();
+
+            var count = _context.BoxTowel.Count(bt => bt.BoxId == id);
+
+            if (count > 0)
+                return BadRequest("La caja tiene items empacados");
+
+            box.IsActive = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
