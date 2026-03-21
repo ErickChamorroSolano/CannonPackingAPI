@@ -2,6 +2,7 @@
 using CannonPackingAPI.Data;
 using CannonPackingAPI.DTOs;
 using CannonPackingAPI.Models;
+using CannonPackingAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,73 +13,58 @@ namespace CannonPackingAPI.Controllers
     public class TowelController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly TowelService _service;
 
-        public TowelController(AppDbContext context)
+        public TowelController(AppDbContext context, TowelService service)
         {
             _context = context;
+            _service = service;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TowelDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.ItemCode))
-                return BadRequest("El código del item es requerido.");
-
-            if (string.IsNullOrWhiteSpace(dto.ProductCode))
-                return BadRequest("El código del producto es requerido.");
-
-            var exists = await _context.Towel.AnyAsync(t => t.ItemCode == dto.ItemCode);
-
-            if (exists)
-                return BadRequest("El código del item ya existe.");
-
-            var towel = new Towel
+            try
             {
-                ItemCode = dto.ItemCode,
-                ProductCode = dto.ProductCode,
-                TowelStatus = TowelStatus.LOOSE.ToString(),
-                IsActive = true
-            };
-
-            _context.Towel.Add(towel);
-            await _context.SaveChangesAsync();
-
-            //return Ok(new
-            //{
-            //    towel.Id,
-            //    towel.ItemCode,
-            //    towel.ProductCode,
-            //    towel.TowelStatus,
-            //    towel.IsActive
-            //});
-            return Ok("Item creado correctamente.");
+                await _service.CreateTowel(dto);
+                return Ok("Item creado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var units = await _context.Towel
-                .Where(x => x.IsActive)
-                .ToListAsync();
+            try
+            {
+                var units = await _context.Towel
+                    .Where(x => x.IsActive)
+                    .ToListAsync();
 
-            return Ok(units);
+                return Ok(units);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // Eliminar (inhabilitar)
         [HttpPut("{id}/disable")]
         public async Task<IActionResult> Disable(int id)
         {
-            var towel = await _context.Towel.FindAsync(id);
-
-            if (towel == null)
-                return NotFound();
-
-            if (towel.TowelStatus == TowelStatus.PACKED.ToString())
-                return BadRequest("No se puede deshabilitar un item empacado.");
-
-            towel.IsActive = false;
-            await _context.SaveChangesAsync();
-            return Ok("Item eliminado correctamente.");
+            try
+            {
+                await _service.DisableTowel(id);
+                return Ok("Item eliminado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
