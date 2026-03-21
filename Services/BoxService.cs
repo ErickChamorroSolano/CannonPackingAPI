@@ -1,4 +1,5 @@
-﻿using CannonPackingAPI.Data;
+﻿using CannonPackingAPI.Common.Enums;
+using CannonPackingAPI.Data;
 using CannonPackingAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ namespace CannonPackingAPI.Services
             if (box == null || !box.IsActive)
                 throw new Exception("La caja no existe.");
 
-            if (box.BoxStatus != "OPEN")
+            if (box.BoxStatus != BoxStatus.OPEN.ToString())
                 throw new Exception("La caja está cerrada.");
 
             var currentCount = await _context.BoxTowel

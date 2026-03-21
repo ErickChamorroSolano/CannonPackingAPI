@@ -1,4 +1,5 @@
-﻿using CannonPackingAPI.Data;
+﻿using CannonPackingAPI.Common.Enums;
+using CannonPackingAPI.Data;
 using CannonPackingAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +23,7 @@ namespace CannonPackingAPI.Services
             if (box == null)
                 throw new Exception("La caja no existe.");
 
-            if (box.BoxStatus != "OPEN")
+            if (box.BoxStatus != BoxStatus.OPEN.ToString())
                 throw new Exception("La caja está cerrada.");
 
             var towel = await _context.Towel.FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
@@ -30,7 +31,7 @@ namespace CannonPackingAPI.Services
             if (towel == null)
                 throw new Exception("El item no existe.");
 
-            if (towel.TowelStatus != "LOOSE")
+            if (towel.TowelStatus != TowelStatus.LOOSE.ToString())
                 throw new Exception("El item ya está empacado.");
 
             //if (towel.ProductCode != box.ProductCode)
@@ -57,7 +58,7 @@ namespace CannonPackingAPI.Services
 
             _context.BoxTowel.Add(boxTowel);
 
-            towel.TowelStatus = "PACKED";
+            towel.TowelStatus = TowelStatus.PACKED.ToString();
 
             await _context.SaveChangesAsync();
         }
@@ -70,7 +71,7 @@ namespace CannonPackingAPI.Services
             if (box == null)
                 throw new Exception("La caja no existe.");
 
-            if (box.BoxStatus != "OPEN")
+            if (box.BoxStatus != BoxStatus.OPEN.ToString())
                 throw new Exception("La caja está cerrada.");
 
             var relation = await _context.BoxTowel
@@ -87,13 +88,11 @@ namespace CannonPackingAPI.Services
             if (towel == null)
                 throw new Exception("El item no existe.");
 
-            if (towel.TowelStatus != "PACKED")
+            if (towel.TowelStatus != TowelStatus.PACKED.ToString())
                 throw new Exception("El item no está empacado.");
 
             relation.IsActive = false;
-
-            towel.TowelStatus = "LOOSE";
-
+            towel.TowelStatus = TowelStatus.LOOSE.ToString();
             await _context.SaveChangesAsync();
         }
 
@@ -105,11 +104,10 @@ namespace CannonPackingAPI.Services
             if (box == null)
                 throw new Exception("La caja no existe.");
 
-            if (box.BoxStatus != "OPEN")
+            if (box.BoxStatus != BoxStatus.OPEN.ToString())
                 throw new Exception("La caja ya está cerrada.");
 
-            box.BoxStatus = "CLOSED";
-
+            box.BoxStatus = BoxStatus.CLOSED.ToString();
             await _context.SaveChangesAsync();
         }
     }

@@ -1,4 +1,5 @@
-﻿using CannonPackingAPI.Data;
+﻿using CannonPackingAPI.Common.Enums;
+using CannonPackingAPI.Data;
 using CannonPackingAPI.DTOs;
 using CannonPackingAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +27,7 @@ namespace CannonPackingAPI.Controllers
             if (string.IsNullOrWhiteSpace(dto.ProductCode))
                 return BadRequest("El código del producto es requerido.");
 
-            var exists = await _context.Towel
-                .AnyAsync(t => t.ItemCode == dto.ItemCode);
+            var exists = await _context.Towel.AnyAsync(t => t.ItemCode == dto.ItemCode);
 
             if (exists)
                 return BadRequest("El código del item ya existe.");
@@ -36,21 +36,22 @@ namespace CannonPackingAPI.Controllers
             {
                 ItemCode = dto.ItemCode,
                 ProductCode = dto.ProductCode,
-                TowelStatus = "LOOSE",
+                TowelStatus = TowelStatus.LOOSE.ToString(),
                 IsActive = true
             };
 
             _context.Towel.Add(towel);
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                towel.Id,
-                towel.ItemCode,
-                towel.ProductCode,
-                towel.TowelStatus,
-                towel.IsActive
-            });
+            //return Ok(new
+            //{
+            //    towel.Id,
+            //    towel.ItemCode,
+            //    towel.ProductCode,
+            //    towel.TowelStatus,
+            //    towel.IsActive
+            //});
+            return Ok("Item creado correctamente.");
         }
 
         [HttpGet]
@@ -72,12 +73,12 @@ namespace CannonPackingAPI.Controllers
             if (towel == null)
                 return NotFound();
 
-            if (towel.TowelStatus == "PACKED")
+            if (towel.TowelStatus == TowelStatus.PACKED.ToString())
                 return BadRequest("No se puede deshabilitar un item empacado.");
 
             towel.IsActive = false;
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok("Item eliminado correctamente.");
         }
     }
 }

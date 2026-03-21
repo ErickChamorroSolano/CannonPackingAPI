@@ -1,4 +1,5 @@
-﻿using CannonPackingAPI.Data;
+﻿using CannonPackingAPI.Common.Enums;
+using CannonPackingAPI.Data;
 using CannonPackingAPI.DTOs;
 using CannonPackingAPI.Models;
 using CannonPackingAPI.Services;
@@ -27,7 +28,7 @@ namespace CannonPackingAPI.Controllers
                 return BadRequest("El código de caja es requerido.");
 
             if (string.IsNullOrWhiteSpace(dto.ProductCode))
-                return BadRequest("El codigo de producto es requerido.");
+                return BadRequest("El código de producto es requerido.");
 
             if (dto.Capacity <= 0)
                 return BadRequest("La capacidad debe ser mayor a 0.");
@@ -42,22 +43,23 @@ namespace CannonPackingAPI.Controllers
                 BoxCode = dto.BoxCode,
                 ProductCode = dto.ProductCode,
                 Capacity = dto.Capacity,
-                BoxStatus = "OPEN",
+                BoxStatus = BoxStatus.OPEN.ToString(),
                 IsActive = true
             };
 
             _context.Box.Add(box);
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                box.Id,
-                box.BoxCode,
-                box.ProductCode,
-                box.Capacity,
-                box.BoxStatus,
-                box.IsActive
-            });
+            //return Ok(new
+            //{
+            //    box.Id,
+            //    box.BoxCode,
+            //    box.ProductCode,
+            //    box.Capacity,
+            //    box.BoxStatus,
+            //    box.IsActive
+            //});
+            return Ok("Caja creada correctamente.");
         }
 
         [HttpGet]
