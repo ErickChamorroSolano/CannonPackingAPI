@@ -38,7 +38,7 @@ namespace CannonPackingAPI.Services
                     BoxCode = dto.BoxCode,
                     ProductCode = dto.ProductCode,
                     Capacity = dto.Capacity,
-                    BoxStatus = BoxStatus.OPEN.ToString(),
+                    Status = BoxStatus.OPEN.ToString(),
                     IsActive = true
                 };
 
@@ -72,9 +72,9 @@ namespace CannonPackingAPI.Services
                 var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
                 if (box == null)
                     throw new Exception("La caja no existe.");
-                if (box.BoxStatus != BoxStatus.CLOSED.ToString())
+                if (box.Status != BoxStatus.CLOSED.ToString())
                     throw new Exception("La caja no está cerrada.");
-                box.BoxStatus = BoxStatus.OPEN.ToString();
+                box.Status = BoxStatus.OPEN.ToString();
                 await _context.SaveChangesAsync();
             }
             catch
@@ -90,11 +90,11 @@ namespace CannonPackingAPI.Services
                 var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
                 if (box == null)
                     throw new Exception("La caja no existe.");
-                var hasItems = await _context.BoxTowel
-                    .AnyAsync(x => x.BoxId == boxId && x.IsActive);
+                var hasItems = await _context.Towel
+                    .AnyAsync(t => t.BoxId == boxId && t.IsActive && t.Status == TowelStatus.PACKED.ToString());
                 if (!hasItems)
                     throw new Exception("La caja no tiene items empacados.");
-                box.BoxStatus = BoxStatus.CLOSED.ToString();
+                box.Status = BoxStatus.CLOSED.ToString();
                 await _context.SaveChangesAsync();
             }
             catch
@@ -110,7 +110,7 @@ namespace CannonPackingAPI.Services
                 var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
                 if (box == null)
                     throw new Exception("La caja no existe.");
-                var hasItems = await _context.BoxTowel
+                var hasItems = await _context.Towel
                     .AnyAsync(x => x.BoxId == boxId && x.IsActive);
                 if (hasItems)
                     throw new Exception("La caja tiene items empacados.");

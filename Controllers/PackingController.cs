@@ -20,7 +20,7 @@ namespace CannonPackingAPI.Controllers
             try
             {
                 await _service.Pack(boxId, towelId);
-                return Ok("Item empacado correctamente");
+                return Ok("Item empacado correctamente.");
             }
             catch (Exception ex)
             {
@@ -34,7 +34,7 @@ namespace CannonPackingAPI.Controllers
             try
             {
                 await _service.Unpack(boxId, towelId);
-                return Ok("Item removido de la caja");
+                return Ok("Item removido de la caja.");
             }
             catch (Exception ex)
             {

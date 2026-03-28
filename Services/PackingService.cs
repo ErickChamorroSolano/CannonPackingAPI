@@ -1,6 +1,5 @@
 ﻿using CannonPackingAPI.Common.Enums;
 using CannonPackingAPI.Data;
-using CannonPackingAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CannonPackingAPI.Services
@@ -19,13 +18,12 @@ namespace CannonPackingAPI.Services
         {
             try
             {
-                var box = await _context.Box
-                    .FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
+                var box = await _context.Box.FirstOrDefaultAsync(b => b.Id == boxId && b.IsActive);
 
                 if (box == null)
                     throw new Exception("La caja no existe.");
 
-                if (box.BoxStatus != BoxStatus.OPEN.ToString())
+                if (box.Status == BoxStatus.CLOSED.ToString())
                     throw new Exception("La caja está cerrada.");
 
                 var towel = await _context.Towel.FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
@@ -33,34 +31,26 @@ namespace CannonPackingAPI.Services
                 if (towel == null)
                     throw new Exception("El item no existe.");
 
-                if (towel.TowelStatus != TowelStatus.LOOSE.ToString())
+                if (towel.Status != TowelStatus.LOOSE.ToString())
                     throw new Exception("El item ya está empacado.");
 
                 if (towel.ProductCode != box.ProductCode)
                     throw new Exception("El item no coincide con la caja.");
 
-                var currentCount = await _context.BoxTowel.CountAsync(bt => bt.BoxId == boxId && bt.IsActive);
+                var currentCount = await _context.Towel.CountAsync(t => t.BoxId == boxId && t.IsActive && t.Status == TowelStatus.PACKED.ToString());
 
                 if (currentCount >= box.Capacity)
                     throw new Exception("La caja está llena.");
 
                 // Validar que no esté en otra caja
-                var alreadyPacked = await _context.BoxTowel.AnyAsync(bt => bt.TowelId == towelId && bt.BoxId != boxId && bt.IsActive);
+                var alreadyPacked = await _context.Towel.AnyAsync(t => t.Id == towelId && t.BoxId != boxId && t.IsActive && t.Status == TowelStatus.PACKED.ToString());
 
                 if (alreadyPacked)
                     throw new Exception("El item está en otra caja.");
 
-                // Agregar
-                var boxTowel = new BoxTowel
-                {
-                    BoxId = boxId,
-                    TowelId = towelId,
-                    IsActive = true
-                };
-
-                _context.BoxTowel.Add(boxTowel);
-
-                towel.TowelStatus = TowelStatus.PACKED.ToString();
+                towel.BoxId = boxId;
+                towel.Box = box;
+                towel.Status = TowelStatus.PACKED.ToString();
 
                 await _context.SaveChangesAsync();
             }
@@ -80,28 +70,23 @@ namespace CannonPackingAPI.Services
                 if (box == null)
                     throw new Exception("La caja no existe.");
 
-                if (box.BoxStatus != BoxStatus.OPEN.ToString())
+                if (box.Status != BoxStatus.OPEN.ToString())
                     throw new Exception("La caja está cerrada.");
-
-                var relation = await _context.BoxTowel
-                    .FirstOrDefaultAsync(bt =>
-                        bt.BoxId == boxId &&
-                        bt.TowelId == towelId &&
-                        bt.IsActive);
-
-                if (relation == null)
-                    throw new Exception("El item no pertenece a esta caja.");
 
                 var towel = await _context.Towel.FirstOrDefaultAsync(t => t.Id == towelId && t.IsActive);
 
                 if (towel == null)
                     throw new Exception("El item no existe.");
 
-                if (towel.TowelStatus != TowelStatus.PACKED.ToString())
+                if (towel.BoxId != boxId)
+                    throw new Exception("El item no pertenece a esta caja.");
+
+                if (towel.Status != TowelStatus.PACKED.ToString())
                     throw new Exception("El item no está empacado.");
 
-                relation.IsActive = false;
-                towel.TowelStatus = TowelStatus.LOOSE.ToString();
+                towel.BoxId = null;
+                towel.Box = null;
+                towel.Status = TowelStatus.LOOSE.ToString();
                 await _context.SaveChangesAsync();
             }
             catch

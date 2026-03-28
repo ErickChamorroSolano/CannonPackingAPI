@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CannonPackingAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260320204255_ModificacionModelos")]
-    partial class ModificacionModelos
+    [Migration("20260328071021_RenovationDB")]
+    partial class RenovationDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,17 +36,18 @@ namespace CannonPackingAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("BoxStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Capacity")
-                        .HasColumnType("int");
+                    b.Property<short>("Capacity")
+                        .HasColumnType("smallint");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -58,34 +59,6 @@ namespace CannonPackingAPI.Migrations
                     b.ToTable("Box");
                 });
 
-            modelBuilder.Entity("CannonPackingAPI.Models.BoxTowel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BoxId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TowelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TowelId");
-
-                    b.HasIndex("BoxId", "TowelId")
-                        .IsUnique()
-                        .HasFilter("IsActive = 1");
-
-                    b.ToTable("BoxTowel");
-                });
-
             modelBuilder.Entity("CannonPackingAPI.Models.Towel", b =>
                 {
                     b.Property<int>("Id")
@@ -93,6 +66,9 @@ namespace CannonPackingAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BoxId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -103,13 +79,16 @@ namespace CannonPackingAPI.Migrations
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("TowelStatus")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BoxId");
 
                     b.HasIndex("ItemCode")
                         .IsUnique();
@@ -117,33 +96,19 @@ namespace CannonPackingAPI.Migrations
                     b.ToTable("Towel");
                 });
 
-            modelBuilder.Entity("CannonPackingAPI.Models.BoxTowel", b =>
+            modelBuilder.Entity("CannonPackingAPI.Models.Towel", b =>
                 {
                     b.HasOne("CannonPackingAPI.Models.Box", "Box")
-                        .WithMany("BoxTowels")
+                        .WithMany("Towels")
                         .HasForeignKey("BoxId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CannonPackingAPI.Models.Towel", "Towel")
-                        .WithMany("BoxTowels")
-                        .HasForeignKey("TowelId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Box");
-
-                    b.Navigation("Towel");
                 });
 
             modelBuilder.Entity("CannonPackingAPI.Models.Box", b =>
                 {
-                    b.Navigation("BoxTowels");
-                });
-
-            modelBuilder.Entity("CannonPackingAPI.Models.Towel", b =>
-                {
-                    b.Navigation("BoxTowels");
+                    b.Navigation("Towels");
                 });
 #pragma warning restore 612, 618
         }

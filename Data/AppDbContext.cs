@@ -7,39 +7,51 @@ namespace CannonPackingAPI.Data
     {
         public DbSet<Towel> Towel => Set<Towel>();
         public DbSet<Box> Box => Set<Box>();
-        public DbSet<BoxTowel> BoxTowel => Set<BoxTowel>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // ItemCode único
             modelBuilder.Entity<Towel>()
                 .HasIndex(t => t.ItemCode)
                 .IsUnique();
 
+            // BoxCode único
             modelBuilder.Entity<Box>()
                 .HasIndex(b => b.BoxCode)
                 .IsUnique();
 
-            // relacion BoxTowel - Box
-            modelBuilder.Entity<BoxTowel>()
-                .HasOne(bt => bt.Box)
-                .WithMany(b => b.BoxTowels)
-                .HasForeignKey(bt => bt.BoxId)
+            // Relación Box - Towel (1 a muchos)
+            modelBuilder.Entity<Towel>()
+                .HasOne(t => t.Box)
+                .WithMany(b => b.Towels)
+                .HasForeignKey(t => t.BoxId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // relacion BoxTowel - Towel
-            modelBuilder.Entity<BoxTowel>()
-                .HasOne(bt => bt.Towel)
-                .WithMany(t => t.BoxTowels)
-                .HasForeignKey(bt => bt.TowelId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configuración de campos
+            modelBuilder.Entity<Towel>()
+                .Property(t => t.ProductCode)
+                .HasMaxLength(20)
+                .IsRequired();
 
-            // evitar duplicados
-            modelBuilder.Entity<BoxTowel>()
-                .HasIndex(bt => new { bt.BoxId, bt.TowelId })
-                .HasFilter("IsActive = 1")
-                .IsUnique();
+            modelBuilder.Entity<Box>()
+                .Property(b => b.ProductCode)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            modelBuilder.Entity<Box>()
+                .Property(b => b.Capacity)
+                .HasColumnType("smallint");
+
+            // guardar status como string
+            modelBuilder.Entity<Towel>()
+                .Property(t => t.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Box>()
+                .Property(b => b.Status)
+                .HasConversion<string>();
         }
     }
 }

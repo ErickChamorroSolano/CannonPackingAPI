@@ -34,21 +34,13 @@ namespace CannonPackingAPI.Services
                 {
                     ItemCode = dto.ItemCode,
                     ProductCode = dto.ProductCode,
-                    TowelStatus = TowelStatus.LOOSE.ToString(),
+                    Status = TowelStatus.LOOSE.ToString(),
+                    BoxId = null,
                     IsActive = true
                 };
 
                 _context.Towel.Add(towel);
                 await _context.SaveChangesAsync();
-
-                //return Ok(new
-                //{
-                //    towel.Id,
-                //    towel.ItemCode,
-                //    towel.ProductCode,
-                //    towel.TowelStatus,
-                //    towel.IsActive
-                //});
             }
             catch
             {
@@ -78,7 +70,7 @@ namespace CannonPackingAPI.Services
                 var towel = await _context.Towel.FindAsync(id);
                 if (towel == null)
                     throw new Exception("El item no existe.");
-                if (towel.TowelStatus == TowelStatus.PACKED.ToString())
+                if (towel.Status == TowelStatus.PACKED.ToString())
                     throw new Exception("No se puede deshabilitar un item empacado.");
                 towel.IsActive = false;
                 await _context.SaveChangesAsync();
