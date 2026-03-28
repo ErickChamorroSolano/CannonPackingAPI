@@ -5,8 +5,9 @@
         public int Id { get; set; }
         public string ItemCode { get; set; } = string.Empty;
         public string ProductCode { get; set; } = string.Empty;
-        public string TowelStatus { get; set; } = Common.Enums.TowelStatus.LOOSE.ToString();
+        public string Status { get; set; } = "LOOSE"; // LOOSE / PACKED
+        public int? BoxId { get; set; }
+        public Box? Box { get; set; }
         public bool IsActive { get; set; } = true;
-        public ICollection<BoxTowel> BoxTowels { get; set; } = new List<BoxTowel>();
     }
 }

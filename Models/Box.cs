@@ -5,9 +5,9 @@
         public int Id { get; set; }
         public string BoxCode { get; set; } = string.Empty;
         public string ProductCode { get; set; } = string.Empty;
-        public int Capacity { get; set; }
-        public string BoxStatus { get; set; } = Common.Enums.BoxStatus.OPEN.ToString();
+        public short Capacity { get; set; } // smallint
+        public string Status { get; set; } = "OPEN"; // OPEN / CLOSED
         public bool IsActive { get; set; } = true;
-        public ICollection<BoxTowel> BoxTowels { get; set; } = new List<BoxTowel>();
+        public ICollection<Towel> Towels { get; set; } = new List<Towel>();
     }
 }

@@ -4,6 +4,6 @@
     {
         public string BoxCode { get; set; } = string.Empty;
         public string ProductCode { get; set; } = string.Empty;
-        public int Capacity { get; set; }
+        public short Capacity { get; set; }
     }
 }

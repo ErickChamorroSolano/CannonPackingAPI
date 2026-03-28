@@ -50,7 +50,7 @@ namespace CannonPackingAPI.Controllers
             try
             {
                 await _service.DisableBox(id);
-                return Ok();
+                return Ok("Caja eliminada correctamente.");
             }
             catch (Exception ex)
             {
@@ -64,7 +64,7 @@ namespace CannonPackingAPI.Controllers
             try
             {
                 await _service.CloseBox(id);
-                return Ok();
+                return Ok("Caja cerrada correctamente.");
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace CannonPackingAPI.Controllers
             try
             {
                 await _service.OpenBox(id);
-                return Ok();
+                return Ok("Caja abierta correctamente.");
             }
             catch (Exception ex)
             {
