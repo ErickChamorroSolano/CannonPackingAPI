@@ -10,6 +10,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+//CORS configuration to allow Angular frontend to access the API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200","https://localhost:4200") // Angular
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddScoped<TowelService>();
 builder.Services.AddScoped<BoxService>();
 builder.Services.AddScoped<PackingService>();
@@ -29,6 +41,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("AllowAngular");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
