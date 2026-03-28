@@ -1,4 +1,5 @@
 using CannonPackingAPI.Data;
+using CannonPackingAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<TowelService>();
+builder.Services.AddScoped<BoxService>();
+builder.Services.AddScoped<PackingService>();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
