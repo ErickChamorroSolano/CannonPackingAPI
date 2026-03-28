@@ -55,6 +55,20 @@ namespace CannonPackingAPI.Services
             }
         }
 
+        public async Task<List<Towel>> GetActiveTowels()
+        {
+            try
+            {
+                return await _context.Towel
+                    .Where(t => t.IsActive)
+                    .ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         //Eliminar item (solo si no está empacado)
         public async Task DisableTowel(int id)
         {

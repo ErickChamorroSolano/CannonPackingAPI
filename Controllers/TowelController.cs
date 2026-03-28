@@ -1,10 +1,6 @@
-﻿using CannonPackingAPI.Common.Enums;
-using CannonPackingAPI.Data;
-using CannonPackingAPI.DTOs;
-using CannonPackingAPI.Models;
+﻿using CannonPackingAPI.DTOs;
 using CannonPackingAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CannonPackingAPI.Controllers
 {
@@ -12,12 +8,10 @@ namespace CannonPackingAPI.Controllers
     [Route("api/[controller]")]
     public class TowelController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly TowelService _service;
 
-        public TowelController(AppDbContext context, TowelService service)
+        public TowelController(TowelService service)
         {
-            _context = context;
             _service = service;
         }
 
@@ -40,10 +34,7 @@ namespace CannonPackingAPI.Controllers
         {
             try
             {
-                var units = await _context.Towel
-                    .Where(x => x.IsActive)
-                    .ToListAsync();
-
+                var units = await _service.GetActiveTowels();
                 return Ok(units);
             }
             catch (Exception ex)
@@ -54,7 +45,7 @@ namespace CannonPackingAPI.Controllers
 
         // Eliminar (inhabilitar)
         [HttpPut("{id}/disable")]
-        public async Task<IActionResult> Disable(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
