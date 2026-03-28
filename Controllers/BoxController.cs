@@ -57,5 +57,33 @@ namespace CannonPackingAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("{id}/close")]
+        public async Task<IActionResult> Close(int id)
+        {
+            try
+            {
+                await _service.CloseBox(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/open")]
+        public async Task<IActionResult> Open(int id)
+        {
+            try
+            {
+                await _service.OpenBox(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
