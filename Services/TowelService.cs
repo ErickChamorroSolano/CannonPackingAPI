@@ -48,12 +48,21 @@ namespace CannonPackingAPI.Services
             }
         }
 
-        public async Task<List<Towel>> GetActiveTowels()
+        public async Task<List<TowelsDto>> GetActiveTowels()
         {
             try
             {
                 return await _context.Towel
                     .Where(t => t.IsActive)
+                    .Select(t => new TowelsDto
+                    {
+                        Id = t.Id,
+                        ItemCode = t.ItemCode,
+                        ProductCode = t.ProductCode,
+                        Status = t.Status,
+                        BoxId = t.BoxId,
+                        BoxCode = t.Box != null ? t.Box.BoxCode : "N/A"
+                    })
                     .ToListAsync();
             }
             catch
