@@ -43,6 +43,23 @@ namespace CannonPackingAPI.Controllers
             }
         }
 
+        [HttpGet("{productcode}/available")]
+        public async Task<IActionResult> GetAvailable(string productcode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(productcode))
+                    throw new Exception("ProductCode es requerido.");
+
+                var units = await _service.GetAvailableTowelsByProductCode(productcode.ToUpper());
+                return Ok(units);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         // Eliminar (inhabilitar)
         [HttpPut("{id}/disable")]
         public async Task<IActionResult> Delete(int id)

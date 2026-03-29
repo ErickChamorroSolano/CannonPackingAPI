@@ -71,6 +71,30 @@ namespace CannonPackingAPI.Services
             }
         }
 
+        public async Task<List<TowelsDto>> GetAvailableTowelsByProductCode(string ProductCode)
+        {
+            try
+            {
+                return await _context.Towel
+                    .Where(t => t.IsActive && t.BoxId == null && t.ProductCode == ProductCode && t.Status == TowelStatus.LOOSE.ToString())
+                    .Select(t => new TowelsDto
+                    {
+                        Id = t.Id,
+                        ItemCode = t.ItemCode,
+                        ProductCode = t.ProductCode,
+                        Status = t.Status,
+                        BoxId = t.BoxId,
+                        BoxCode = t.Box != null ? t.Box.BoxCode : "N/A"
+                    })
+                    .OrderBy(t => t.ItemCode)
+                    .ToListAsync();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         //Eliminar item (solo si no está empacado)
         public async Task DisableTowel(int id)
         {

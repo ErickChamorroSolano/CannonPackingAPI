@@ -51,12 +51,31 @@ namespace CannonPackingAPI.Services
             }
         }
 
-        public async Task<List<Box>> GetActiveBoxes()
+        public async Task<List<BoxesDto>> GetActiveBoxes()
         {
             try
             {
                 return await _context.Box
-                    .Where(x => x.IsActive)
+                    .Where(b => b.IsActive)
+                    .Select(bd => new BoxesDto
+                    {
+                        Id = bd.Id,
+                        BoxCode = bd.BoxCode,
+                        ProductCode = bd.ProductCode,
+                        Capacity = bd.Capacity,
+                        Status = bd.Status,
+                        CurrentCount = (short)bd.Towels.Count(t => t.IsActive && t.Status == TowelStatus.PACKED.ToString()),
+                        IsActive = bd.IsActive,
+                        Towels = bd.Towels.Where(t => t.IsActive).Select(td => new TowelsDto { 
+                            Id = td.Id,
+                            ItemCode = td.ItemCode,
+                            ProductCode = td.ProductCode,
+                            BoxId = td.BoxId,
+                            BoxCode = bd.BoxCode,
+                            Status = td.Status,
+                            IsActive = td.IsActive
+                        }).ToList()
+                    })
                     .ToListAsync();
             }
             catch
